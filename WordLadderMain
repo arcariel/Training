@@ -1,0 +1,110 @@
+import java.util.*;
+
+public class WordLadderMain {
+    public static void main(String[] args) {
+
+        //default values
+        String start = "hit";
+        String end = "cog";
+        List<String> dict = new ArrayList<>(Arrays.asList("hot","dot","dog","lot","log"));
+
+        if (args.length == 3) {
+            start = args[0];
+            end = args[1];
+            //comma separated values
+            dict = new ArrayList<>(Arrays.asList(args[2].split(",")));
+        }
+
+        WordLadder wordLadder = new WordLadder(start, end, dict);
+        System.out.println(wordLadder.ladderLength());
+    }
+}
+
+class WordLadder {
+    private String start;
+    private String end;
+    private List<String> dict;
+
+    public WordLadder(String start, String end, List<String> dict) {
+        this.start = start;
+        this.end = end;
+        this.dict = dict;
+    }
+
+    public ResultInfo ladderLength() {
+        ResultInfo resultInfo = new ResultInfo();
+        System.out.println("Start: " + start);
+        System.out.println("End: " + end);
+        System.out.println("Dictionary: " + Arrays.toString(dict.toArray()));
+        System.out.println("----------------------");
+        System.out.println("----------------------");
+
+        if (start.equals(end)) return resultInfo;
+        if (start.length() != end.length()) {
+            resultInfo.setWordArray("'" + start + "' word is not same length as '" + end + "' word.");
+            return resultInfo;
+        }
+
+        Queue<String> queue = new LinkedList<>();
+        Map<String, String> knownWord = new HashMap<>();
+        queue.offer(start);
+        knownWord.put(start, null);
+        while (!queue.isEmpty()) {
+            String currentWord = queue.poll();
+            if (currentWord.equals(end)) break;
+
+            for (int i = 0; i < currentWord.length(); i++) {
+                char[] chars = currentWord.toCharArray();
+                for (char c = 'a'; c <= 'z'; c++) {
+                    chars[i] = c;
+                    String newWord = new String(chars);
+                    if (newWord.equals(end)) {
+                        knownWord.put(newWord, currentWord);
+                        queue.offer(newWord);
+                        break;
+                    }
+                    if (dict.contains(newWord) && !knownWord.containsKey(newWord)) {
+                        queue.offer(newWord);
+                        knownWord.put(newWord, currentWord);
+                    }
+                }
+            }
+        }
+        String word = end;
+        List<String> ladder = new LinkedList<>();
+        while (word != null) {
+            ladder.add(0, word);
+            word = knownWord.get(word);
+        }
+
+        resultInfo.setWordArray(Arrays.toString(ladder.toArray()));
+        resultInfo.setSteps(ladder.size());
+        return resultInfo;
+    }
+}
+
+class ResultInfo {
+    private String wordArray;
+    private int steps;
+
+    public String getWordArray() {
+        return wordArray;
+    }
+
+    public void setWordArray(String wordArray) {
+        this.wordArray = wordArray;
+    }
+
+    public int getSteps() {
+        return steps;
+    }
+
+    public void setSteps(int steps) {
+        this.steps = steps;
+    }
+
+    @Override
+    public String toString() {
+        return wordArray + " = size " + steps + " to reach the word.";
+    }
+}
