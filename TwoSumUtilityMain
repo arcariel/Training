@@ -1,0 +1,92 @@
+import java.util.*;
+
+public class TwoSumUtilityMain {
+    public static void main(String[] args) {
+        final String YES = "Y";
+        System.out.println("---------------------------");
+        System.out.println("      Pair sum Finder");
+        System.out.println("---------------------------");
+
+        TwoSum twoSum = new TwoSum();
+        Integer sum = 9;
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Do you want to provide numbers to find? Y/N: ");
+        String str = scanner.nextLine();
+        if (YES.equalsIgnoreCase(str)) {
+            String answer = YES;
+            do {
+                System.out.print("Enter Integer value: ");
+                String numberToRead = "";
+                try {
+                    numberToRead = scanner.nextLine();
+                    twoSum.addNumber(Integer.parseInt(numberToRead));
+                } catch (NumberFormatException e) {
+                    System.out.println(numberToRead + " is not a Integer value!");
+                }
+                System.out.print("If you want to add one more value type Y: ");
+                answer = scanner.nextLine();
+            } while (YES.equalsIgnoreCase(answer));
+            System.out.print("Enter the target sum value to find: ");
+            sum = scanner.nextInt();
+        } else {
+            twoSum.addNumber(2);
+            twoSum.addNumber(7);
+            twoSum.addNumber(11);
+            twoSum.addNumber(15);
+            twoSum.addNumber(4);
+            twoSum.addNumber(5);
+        }
+
+        System.out.println("-----------------------");
+        System.out.println("Target: " + sum);
+        System.out.println("Provided values: " + twoSum.getValues());
+
+        System.out.println("Pair(s) of index(es) found: ");
+        twoSum.find(sum).forEach((integer, integer2) -> {
+            System.out.println("Index 1 : " + integer + " Index 2: " + integer2);
+        });
+    }
+}
+
+class TwoSum implements TwoSumInterface {
+
+    private List<Integer> values;
+
+    public TwoSum() {
+        values = new ArrayList<>();
+    }
+
+    @Override
+    public void addNumber(Integer number) {
+        values.add(number);
+    }
+
+    @Override
+    public Map<Integer, Integer> find(Integer sum) {
+        if (values.isEmpty() || values.size() < 2) {
+            System.out.println("There are no enough values to execute the required operation.");
+            return null;
+        }
+
+        Map<Integer, Integer> indexes = new HashMap<>();
+        for (int i = 0; i < values.size(); i++) {
+            Integer currentNumber = values.get(i);
+            Integer difference = sum - currentNumber;
+
+            int index = values.indexOf(difference);
+            if (index >= 0 && !indexes.containsKey(index+1)) {
+                indexes.put(i+1, index+1);
+            }
+        }
+        return indexes;
+    }
+
+    public List<Integer> getValues() {
+        return values;
+    }
+}
+
+interface TwoSumInterface {
+    void addNumber(Integer number);
+    Map<Integer, Integer> find(Integer sum);
+}
